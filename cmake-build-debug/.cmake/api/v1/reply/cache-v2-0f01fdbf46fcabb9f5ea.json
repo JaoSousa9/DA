@@ -55,7 +55,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/home/joaosousa/Documents/DA/projDA/cmake-build-debug"
+			"value" : "/home/joaos/Documents/FEUP/DA/cmake-build-debug"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -543,7 +543,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/home/joaosousa/Documents/DA/projDA/cmake-build-debug/CMakeFiles/pkgRedirects"
+			"value" : "/home/joaos/Documents/FEUP/DA/cmake-build-debug/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -603,7 +603,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/home/joaosousa/Documents/DA/projDA"
+			"value" : "/home/joaos/Documents/FEUP/DA"
 		},
 		{
 			"name" : "CMAKE_INSTALL_PREFIX",
@@ -1163,7 +1163,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/home/joaosousa/Documents/DA/projDA/cmake-build-debug"
+			"value" : "/home/joaos/Documents/FEUP/DA/cmake-build-debug"
 		},
 		{
 			"name" : "projDA_IS_TOP_LEVEL",
@@ -1187,7 +1187,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/home/joaosousa/Documents/DA/projDA"
+			"value" : "/home/joaos/Documents/FEUP/DA"
 		}
 	],
 	"kind" : "cache",

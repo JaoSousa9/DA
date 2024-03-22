@@ -4,7 +4,6 @@ project(projDA)
 set(CMAKE_CXX_STANDARD 17)
 
 add_executable(projDA main.cpp
-        data_structures/Graph.h
         model/waterReservoir.cpp
         model/waterReservoir.h
         model/pipe.cpp
@@ -14,4 +13,6 @@ add_executable(projDA main.cpp
         model/station.cpp
         model/station.h
         controller/graphBuilder.cpp
-        controller/graphBuilder.h)
+        controller/graphBuilder.h
+        data_structures/UFDS.cpp
+        algorithms/algo.cpp)

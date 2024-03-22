@@ -4,10 +4,12 @@
 
 #include <sstream>
 #include <algorithm>
+#include <fstream>
 #include "graphBuilder.h"
 
+using namespace std;
 
-vector<string> graphBuilder::createNodes(const std::string &path) {
+vector<string> graphBuilder::createNodes(const string& path) {
     fstream fin;
     fin.open(path, ios::in);
 
@@ -21,8 +23,10 @@ vector<string> graphBuilder::createNodes(const std::string &path) {
 
     long numberOfTuples = count(CSV.begin(), CSV.end(),',');
 
+
     for(int i = 0; i <= numberOfTuples; i++){
          getline(firstTuple, temp, ',');
+
         if(temp == "Code"){
             codePos = i;
             break;
@@ -50,11 +54,11 @@ vector<string> graphBuilder::createNodes(const std::string &path) {
         }
     }
 
+
     for(string c : codes){
         portugalGraph.addVertex(c);
     }
-
-    return rows;
+    return codes;
 }
 
 vector<pipe> graphBuilder::createEdges(const string &path) {
@@ -85,12 +89,14 @@ vector<pipe> graphBuilder::createEdges(const string &path) {
 
         pipe p(source, dest, weight, direction);
         pipes.push_back(p);
-        portugalGraph.addEdge(source, dest, weight);
 
         if(direction ==  0){
-            portugalGraph.addEdge(dest, source, weight);
+            portugalGraph.addBidirectionalEdge(source, dest, weight);
+        }else{
+            portugalGraph.addEdge(source, dest, weight);
         }
     }
+
 
     return pipes;
 

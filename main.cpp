@@ -8,13 +8,14 @@
 #include "model/waterReservoir.h"
 #include "model/station.h"
 #include "controller/graphBuilder.h"
+#include "algorithms/algo.cpp"
 
 int main() {
 
-    string path_cities = "/home/joaosousa/Documents/DA/projDA/Project1LargeDataSet/Cities.csv";
-    string path_reservoir = "/home/joaosousa/Documents/DA/projDA/Project1LargeDataSet/Reservoir.csv";
-    string path_stations = "/home/joaosousa/Documents/DA/projDA/Project1LargeDataSet/Stations.csv";
-    string path_pipes = "/home/joaosousa/Documents/DA/projDA/Project1LargeDataSet/Pipes.csv";
+    string path_cities = "/home/joaos/Documents/FEUP/DA/Project1LargeDataSet/Cities.csv";
+    string path_reservoir = "/home/joaos/Documents/FEUP/DA/Project1LargeDataSet/Reservoir.csv";
+    string path_stations = "/home/joaos/Documents/FEUP/DA/Project1LargeDataSet/Stations.csv";
+    string path_pipes = "/home/joaos/Documents/FEUP/DA/Project1LargeDataSet/Pipes.csv";
 
     graphBuilder g;
     vector<string> cities = g.createNodes(path_cities);
@@ -22,19 +23,23 @@ int main() {
     vector<string> stations = g.createNodes(path_stations);
     vector<pipe> pipes = g.createEdges(path_pipes);
 
+    Graph<string> graph = g.getPortugalGraph();
+
     map<string, city> cityMap = g.buildCityMap(cities);
     map<string, station> stationMap = g.buildStationMap(stations);
     map<string, waterReservoir> waterReservoirMap = g.buildWaterReservoirMap(reservoir);
 
+    string SUPER_SOURCE = "S";
 
-    /*for (const auto& pair : cityMap) {
-        cout << "Value for key " <<  pair.first << ": " << pair.second.getName() << endl;
+    graph.addVertex(SUPER_SOURCE);
 
-    for (const auto& pair : stationMap) {
-        cout << pair.first << endl;
+    for(string r : reservoir) {
+        graph.addEdge(SUPER_SOURCE, r, INF);
     }
-    for (const auto& pair : waterReservoirMap) {
-        cout << "Value for key " <<  pair.first << ": " << pair.second.getMunicipality() << "reservoir " << pair.second.getReservoir()<< endl;
-    }*/
+
+    double maxFLow = edmondsKarp(&graph, SUPER_SOURCE, "C_17");
+
+    cout << " " << maxFLow;
+
     return 0;
 }
