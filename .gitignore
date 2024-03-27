@@ -6,7 +6,8 @@
 *.obj
 *.idea
 .cmake-build-debug/
-
+.vscode
+main
 # Precompiled Headers
 *.gch
 *.pch

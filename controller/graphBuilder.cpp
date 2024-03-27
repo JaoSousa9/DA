@@ -1,7 +1,7 @@
 //
 // Created by joaosousa on 06-03-2024.
 //
-
+#include <cstring>  
 #include <sstream>
 #include <algorithm>
 #include <fstream>
@@ -9,59 +9,8 @@
 
 using namespace std;
 
-vector<string> graphBuilder::createNodes(const string& path) {
-    fstream fin;
-    fin.open(path, ios::in);
-
-    vector<string> rows;
-    vector<string> codes;
-    string CSV, temp;
-    int codePos = 0;
-
-    getline(fin, CSV , '\n');
-    stringstream firstTuple(CSV);
-
-    long numberOfTuples = count(CSV.begin(), CSV.end(),',');
-
-
-    for(int i = 0; i <= numberOfTuples; i++){
-         getline(firstTuple, temp, ',');
-
-        if(temp == "Code"){
-            codePos = i;
-            break;
-        }
-        codePos=i;
-    }
-
-    //get all rows
-    while (!fin.eof()) {
-        getline(fin, CSV , '\n');
-        rows.push_back(CSV);
-    }
-
-    for (string r: rows) {
-        stringstream tuple(r);
-
-        int i = 0;
-        while(getline(tuple, r, ',')){
-            if(codePos == i){
-                codes.push_back(r);
-                i++;
-            }else{
-                i++;
-            }
-        }
-    }
-
-
-    for(string c : codes){
-        portugalGraph.addVertex(c);
-    }
-    return codes;
-}
-
-vector<pipe> graphBuilder::createEdges(const string &path) {
+vector<pipe> graphBuilder::createEdges(Graph<string>& portugalGraph) {
+    string path = "Project1LargeDataSet/Pipes.csv";
     fstream fin;
     fin.open(path, ios::in);
 
@@ -93,7 +42,7 @@ vector<pipe> graphBuilder::createEdges(const string &path) {
         if(direction ==  0){
             portugalGraph.addBidirectionalEdge(source, dest, weight);
         }else{
-            portugalGraph.addEdge(source, dest, weight);
+            bool r = portugalGraph.addEdge(source, dest, weight);
         }
     }
 
@@ -111,7 +60,10 @@ Graph<string> graphBuilder::getPortugalGraph(){
 }
 
 
-map<string, city> graphBuilder::buildCityMap(const vector<string>& cities) {
+map<string, city> graphBuilder::buildCityMap(Graph<string>& portugalGraph) {
+
+    fstream fin;
+    fin.open("Project1LargeDataSet/Cities.csv", ios::in);
 
     string name;
     int id;
@@ -120,20 +72,26 @@ map<string, city> graphBuilder::buildCityMap(const vector<string>& cities) {
     int population;
     map<string, city> citiesMap;
 
-    for (string r: cities) {
+    string CSV, temp;
 
-        stringstream tuple(r);
+    getline(fin, CSV , '\n');
+    stringstream firstTuple(CSV);
 
-        getline(tuple, name, ',');
-        tuple >> id;
-        tuple.ignore();
-        getline(tuple, code, ',');
-        tuple >> demand;
-        tuple.ignore();
-        tuple >> population;
+    //get all rows
+    while (!fin.eof()) {
+
+        getline(fin, name, ',');
+        fin >> id;
+        fin.ignore();
+        getline(fin, code, ',');
+        fin >> demand;
+        fin.ignore();
+        fin >> population;
+        getline(fin, temp);
 
         city c(name,id,code,demand,population);
 
+        portugalGraph.addVertex(code);
         citiesMap.insert(pair<string, city>(code,c));
     }
 
@@ -141,28 +99,43 @@ map<string, city> graphBuilder::buildCityMap(const vector<string>& cities) {
 }
 
 
-map<string, station> graphBuilder::buildStationMap(const vector<string>& stations) {
+map<string, station> graphBuilder::buildStationMap(Graph<string>& portugalGraph) {
+
+    fstream fin;
+    fin.open("Project1LargeDataSet/Stations.csv", ios::in);
 
     int id;
     string code;
     map<string, station> stationsMap;
 
-    for (string s: stations) {
+    string CSV, temp;
 
-        stringstream tuple(s);
+    getline(fin, CSV , '\n');
+    stringstream firstTuple(CSV);
 
-        tuple >> id;
-        tuple.ignore();
+    //get all rows
+    while (!fin.eof()) {
+
+        getline(fin, temp);
+        stringstream tuple(temp);
+
+        getline(tuple, temp, ',');
         getline(tuple, code, ',');
+        //cout << code << endl;
 
         station st(id,code);
 
+        portugalGraph.addVertex(code);
         stationsMap.insert(pair<string, station>(code,st));
     }
+
     return stationsMap;
 }
 
-map<string, waterReservoir> graphBuilder::buildWaterReservoirMap(const vector<string>& reservoirs) {
+map<string, waterReservoir> graphBuilder::buildWaterReservoirMap(Graph<string>& portugalGraph) {
+
+    fstream fin;
+    fin.open("Project1LargeDataSet/Reservoir.csv", ios::in);
 
     string reservoir;
     string municipality;
@@ -171,16 +144,20 @@ map<string, waterReservoir> graphBuilder::buildWaterReservoirMap(const vector<st
     int maxCapacity;
     map<string, waterReservoir> reservoirMap;
 
-    for (string r: reservoirs) {
+    string CSV, temp;
 
-        stringstream tuple(r);
+    getline(fin, CSV , '\n');
+    stringstream firstTuple(CSV);
 
-        getline(tuple, reservoir, ',');
-        getline(tuple, municipality, ',');
-        tuple >> id;
-        tuple.ignore();
-        getline(tuple, code, ',');
-        tuple >> maxCapacity;
+    //get all rows
+    while (!fin.eof()) {
+
+        getline(fin, reservoir, ',');
+        getline(fin, municipality, ',');
+        fin >> id;
+        fin.ignore();
+        getline(fin, code, ',');
+        fin >> maxCapacity;
 
         waterReservoir wr(reservoir,municipality,id,code,maxCapacity);
 
