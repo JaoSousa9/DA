@@ -104,29 +104,29 @@ map<string, station> graphBuilder::buildStationMap(Graph<string>& portugalGraph)
     fstream fin;
     fin.open("Project1LargeDataSet/Stations.csv", ios::in);
 
-    int id;
-    string code;
     map<string, station> stationsMap;
 
-    string CSV, temp;
-
+    string CSV;
     getline(fin, CSV , '\n');
-    stringstream firstTuple(CSV);
 
-    //get all rows
-    while (!fin.eof()) {
+    string line;
+    while (getline(fin, line)) {
 
-        getline(fin, temp);
-        stringstream tuple(temp);
 
-        getline(tuple, temp, ',');
-        getline(tuple, code, ',');
-        //cout << code << endl;
+        stringstream ss(line);
+        string token;
+        getline(ss, token, ',');
+        int id = stoi(token);
+        getline(ss, token, ','); 
 
-        station st(id,code);
+        token.erase(0, token.find_first_not_of(" \t\r\n"));
+        string code = token.erase(token.find_last_not_of(" \t\r\n") + 1);
+        station st(id, code);
+
 
         portugalGraph.addVertex(code);
-        stationsMap.insert(pair<string, station>(code,st));
+        stationsMap.insert(pair<string, station>(code,st)); 
+
     }
 
     return stationsMap;
@@ -161,6 +161,7 @@ map<string, waterReservoir> graphBuilder::buildWaterReservoirMap(Graph<string>& 
 
         waterReservoir wr(reservoir,municipality,id,code,maxCapacity);
 
+        portugalGraph.addVertex(code);
         reservoirMap.insert(pair<string, waterReservoir>(code,wr));
     }
 

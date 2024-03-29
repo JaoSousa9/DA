@@ -358,11 +358,11 @@ std::vector<Vertex<T> *> Graph<T>::getVertexSet() const {
 template <class T>
 Vertex<T> * Graph<T>::findVertex(const T &in) const {
     for (auto v : vertexSet){
-        
         if (v->getInfo() == in){
             return v;
         }
     }
+
     return nullptr;
 }
 
@@ -417,6 +417,7 @@ bool Graph<T>::removeVertex(const T &in) {
  */
 template <class T>
 bool Graph<T>::addEdge(const T &sourc, const T &dest, double w) {
+    
     auto v1 = findVertex(sourc);
     auto v2 = findVertex(dest);
 
