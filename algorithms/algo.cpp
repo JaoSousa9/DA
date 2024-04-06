@@ -1,5 +1,8 @@
 #include "../data_structures/Graph.h"
+#include "../model/waterReservoir.h"
+#include "../model/city.h"
 #include <iostream>
+#include <map>
 
 template <class T>
 void testAndVisit(std::queue<Vertex<T> *> &q, Edge<T> *e, Vertex<T> *w, double residual)
@@ -52,6 +55,7 @@ template <class T>
 double findMinResidualAlongPath(Vertex<T> *s, Vertex<T> *t)
 {
     double f = INF;
+
     // Traverse the augmenting path to find the minimum residual capacity
     for (auto v = t; v != s;)
     {
@@ -72,11 +76,16 @@ double findMinResidualAlongPath(Vertex<T> *s, Vertex<T> *t)
 }
 // Function to augment flow along the augmenting path with the given flow value
 template <class T>
-void augmentFlowAlongPath(Vertex<T> *s, Vertex<T> *t, double f)
+void augmentFlowAlongPath(Vertex<T> *s, Vertex<T> *t, double f, std::map<std::string, waterReservoir> *m)
 {
+
     // Traverse the augmenting path and update the flow values accordingly to f
     for (auto v = t; v != s;)
     {
+        if(v->getInfo()[0] == 'R'){
+            int ammount = m->at(v->getInfo()).getMaxCapacity();
+            m->at(v->getInfo()).setMaxCapacity(ammount - f);
+        }
         auto e = v->getPath();
         double flow = e->getFlow();
         if (e->getDest() == v)
@@ -94,12 +103,14 @@ void augmentFlowAlongPath(Vertex<T> *s, Vertex<T> *t, double f)
 
 // Main function implementing the Edmonds-Karp algorithm
 template <class T>
-double edmondsKarp(Graph<T> *g, std::string source, std::string target)
+double edmondsKarp(Graph<T> *g, std::string source, std::string target, std::map<std::string, waterReservoir> *m, std::map<std::string, city> *c)
 {
 
     // Find source and target vertices in the graph
     Vertex<T> *s = g->findVertex(source);
     Vertex<T> *t = g->findVertex(target);
+
+    double demand = c->at(t->getInfo()).getDemand();
 
     // Validate source and target vertices
     if (s == nullptr)
@@ -123,9 +134,16 @@ double edmondsKarp(Graph<T> *g, std::string source, std::string target)
     {
         // While there is paths from s to t
         double f = findMinResidualAlongPath(s, t);
+        if(demand < maxFlow + f){
+            f = demand;
+            augmentFlowAlongPath(s, t, f, m);
+            return demand;
+        }else{
         // remove flow f from that path backwards
-        augmentFlowAlongPath(s, t, f);
-        maxFlow += f;
+            augmentFlowAlongPath(s, t, f, m);
+            maxFlow += f;
+        }
+
     }
 
     return maxFlow;
