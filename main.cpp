@@ -61,9 +61,16 @@ int main() {
         if(task_choice == 1){
 
             cout << "Choose a City:" << endl;
+            int line = 0;
             for(auto v : cityMap){
-                cout << cityMap.at(v.first).getName() << " " << cityMap.at(v.first).getCode() << endl;
+                cout << "(" + v.second.getName() << " " << v.second.getCode() + ")" << " ";
+                if(line == 5){
+                    line=0;
+                    cout << endl;
+                }
+                line++;
             }
+
             cout << "ALL" << endl;
 
             cout << endl;
@@ -75,18 +82,16 @@ int main() {
                 for(auto v : cityMap){
 
                     double maxFLow = edmondsKarp(&portugalGraph, SUPER_SOURCE, v.first, &waterReservoirMap, &cityMap);
-                    double demand = cityMap.at(v.first).getDemand();
+                    double demand = v.second.getDemand();
 
-                    cout << cityMap.at(v.first).getName() + " has a maximum flow of " << maxFLow << " " << cityMap.at(v.first).getCode() << endl;
+                    cout << v.second.getName() + " has a maximum flow of " << maxFLow << " " << v.second.getCode() << endl;
                 }
-            }
-
-            if(cityMap.count(code)){
+            }else if(cityMap.count(code)){
                 city c = cityMap.at(code);
 
                 double maxFlow = edmondsKarp(&portugalGraph, SUPER_SOURCE, c.getCode(), &waterReservoirMap, &cityMap);
 
-                cout << "The city " << c.getName() << " gets " << maxFlow << "maxFLow" << endl;
+                cout << "The city " << c.getName() << " gets " << maxFlow << " maxFLow" << endl;
             }else{
                 cout << "Invalid City " << endl;
             }
@@ -99,10 +104,10 @@ int main() {
             for(auto v : cityMap){
 
                 double maxFLow = edmondsKarp(&portugalGraph, SUPER_SOURCE, v.first, &waterReservoirMap, &cityMap);
-                double demand = cityMap.at(v.first).getDemand();
+                double demand = v.second.getDemand();
 
                 if(demand > maxFLow){
-                    cout << cityMap.at(v.first).getName() + " is in debt " << demand-maxFLow << " " << cityMap.at(v.first).getCode() << endl;
+                    cout << v.second.getName() + " is in debt " << demand-maxFLow << " " << v.second.getCode() << endl;
                 } 
             }
             
@@ -116,20 +121,33 @@ int main() {
             string code;
 
             cout << "Choose the water reservoir you desire to remove " << endl; 
+
+            int lines = 0;
+
             for(auto r : waterReservoirMap){
-                cout << "    " << waterReservoirMap.at(r.first).getCode() << endl; 
+                cout << "  " << r.first;
+                if(lines == 5){
+                    lines = 0;
+                    cout << endl;
+                } 
+                lines++;
             }
+            cout << endl;
 
             cin >> code;
+
+            std::map<string , double> deficitBefore;
+            std::map<string , double> deficitAfter;
 
             //Print cities with deficit before
             for(auto v : cityMap){
 
                 double maxFLow = edmondsKarp(&portugalGraph, SUPER_SOURCE, v.first, &waterReservoirMap, &cityMap);
-                double demand = cityMap.at(v.first).getDemand();
+                double demand = v.second.getDemand();
 
                 if(demand > maxFLow){
-                    cout << cityMap.at(v.first).getName() + " is in debt " << demand-maxFLow << " " << cityMap.at(v.first).getCode() << endl;
+                    deficitBefore.insert(pair<string, double>(v.second.getName(),demand-maxFLow));
+                    cout << v.second.getName() + " is in debt " << demand-maxFLow << " " << v.second.getCode() << endl;
                 } 
             }
             
@@ -149,15 +167,30 @@ int main() {
                 portugalGraph.removeEdge(SUPER_SOURCE, code);
                 portugalGraph.removeVertex(code);
 
-                //Debt with the reservoir removed
+                //Debt after reservoir removed
                 for(auto v : cityMap){
 
                     double maxFLow = edmondsKarp(&portugalGraph, SUPER_SOURCE, v.first, &waterReservoirMap, &cityMap);
-                    double demand = cityMap.at(v.first).getDemand();
+                    double demand = v.second.getDemand();
 
                     if(demand > maxFLow){
-                        cout << cityMap.at(v.first).getName() + " is in debt " << demand-maxFLow << " " << cityMap.at(v.first).getCode() << endl;
+                        deficitAfter.insert(pair<string, double>(v.second.getName(),demand-maxFLow));
                     } 
+                }
+
+                for(auto after : deficitAfter){
+                    bool newCity = true;
+                    for(auto before: deficitBefore){
+                        if(after.first == before.first){
+                            newCity = false;
+                            if(after.second != before.second){
+                                cout << "The city " + after.first + " got affected and the new deficit is " << after.second << endl;
+                            }
+                        }
+                    }
+                    if(newCity){
+                        cout << "The city " + after.first + " got affected and the new deficit is " << after.second << endl;
+                    }
                 }
                 
                 
@@ -170,6 +203,101 @@ int main() {
                     portugalGraph.addEdge(code, repair.first , repair.second);
                 }
                 portugalGraph.addEdge(SUPER_SOURCE, code, INF);
+
+            }
+        }if(task_choice == 5){
+            //Remove a pumping station -> find the adjacent edges to it -> Apply Edmonds Karp
+            
+            std::map<string , double> deficitBefore;
+            std::map<string , double> deficitAfter;
+            cout << endl;
+
+            string code;
+
+            cout << "Choose the pumping station you desire to remove " << endl; 
+            int lines = 0;
+            for(auto r : stationMap){
+                cout << "  " << r.first;
+                if(lines == 20){
+                    lines = 0;
+                    cout << endl;
+                } 
+                lines++;
+            }
+
+            cin >> code;
+
+            //Print cities with deficit before
+            for(auto v : cityMap){
+
+                double maxFLow = edmondsKarp(&portugalGraph, SUPER_SOURCE, v.first, &waterReservoirMap, &cityMap);
+                double demand = v.second.getDemand();
+
+                if(demand > maxFLow){
+                    deficitBefore.insert(pair<string, double>(v.second.getName(),demand-maxFLow));
+                    cout << v.second.getName() + " is in debt " << demand-maxFLow << " " << v.second.getCode() << endl;
+                } 
+            }
+
+            cout << endl;
+            cout << endl;
+            
+             if(stationMap.count(code)){
+
+                std::map<string , double> savedOutEdges;
+                std::map<string , double> savedInEdges;
+                std::vector<Edge<string> * > outgoing = portugalGraph.findVertex(code)->getAdj();
+                std::vector<Edge<string> * > ingoing = portugalGraph.findVertex(code)->getIncoming();
+
+                //Save the outgoing edges wich the pumping station was connected
+                for(auto repair : outgoing){
+                        savedOutEdges.insert(pair<string, double>(repair->getDest()->getInfo(), repair->getWeight()));
+                }
+
+                for(auto repair : ingoing){
+                        savedInEdges.insert(pair<string, double>(repair->getOrig()->getInfo(), repair->getWeight()));
+                }
+
+                portugalGraph.removeVertex(code);
+
+                //Debt after the pumping station is removed
+                for(auto v : cityMap){
+
+                    double maxFLow = edmondsKarp(&portugalGraph, SUPER_SOURCE, v.first, &waterReservoirMap, &cityMap);
+                    double demand = v.second.getDemand();
+
+                    if(demand > maxFLow){
+                        deficitAfter.insert(pair<string, double>(v.second.getName(),demand-maxFLow));
+                    } 
+                }
+                
+
+                for(auto after : deficitAfter){
+                    bool newCity = true;
+                    for(auto before: deficitBefore){
+                        if(after.first == before.first){
+                            newCity = false;
+                            if(after.second != before.second){
+                                cout << "The city " + after.first + " got affected and the new deficit is " << after.second << endl;
+                            }
+                        }
+                    }
+                    if(newCity){
+                        cout << "The city " + after.first + " got affected and the new deficit is " << after.second << endl;
+                    }
+                }
+                
+                cout << endl;
+                cout << endl;
+
+                //Reconstruct the graph
+                portugalGraph.addVertex(code);   
+                for(auto repair : savedOutEdges){
+                    portugalGraph.addEdge(code, repair.first , repair.second);
+                }
+                for(auto repair : savedInEdges){
+                    portugalGraph.addEdge(repair.first, code, repair.second);
+                }
 
             }
         }
