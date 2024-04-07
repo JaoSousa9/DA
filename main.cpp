@@ -39,10 +39,11 @@ int main() {
         cout << "Choose the desired task:" << endl;
         cout << "Maximum FLow of each City (1)" << endl;
         cout << "Cities in debt            (2)" << endl;
+        cout << "Balancing the graph       (3)" << endl;
         cout << "Remove a reservoir        (4)" << endl;
-        cout << "Remove a pipe             (5)" << endl;
-        cout << "T3.3 (6)" << endl;
-        cout << "QUIT (7)"  << endl;
+        cout << "Remove a Pumping Station  (5)" << endl;
+        cout << "Remove a Pipe             (6)" << endl;
+        cout << "QUIT                      (7)" << endl;
         cout << "Choice: ";
 
         int task_choice;
@@ -100,7 +101,7 @@ int main() {
             cout << endl;
             
             
-        }if(task_choice == 2){
+        }else if(task_choice == 2){
             for(auto v : cityMap){
 
                 double maxFLow = edmondsKarp(&portugalGraph, SUPER_SOURCE, v.first, &waterReservoirMap, &cityMap);
@@ -113,7 +114,12 @@ int main() {
             
             cout << endl;
             cout << endl;
-        }if(task_choice == 4){
+        }else if (task_choice == 3){
+
+            balanceLoad(&portugalGraph, &waterReservoirMap, &cityMap);
+
+
+        }else if(task_choice == 4){
             //Remove a reservoir  -> find the adjacent edges to it -> Apply Edmonds Karp
 
             cout << endl;
@@ -205,7 +211,7 @@ int main() {
                 portugalGraph.addEdge(SUPER_SOURCE, code, INF);
 
             }
-        }if(task_choice == 5){
+        }else if(task_choice == 5){
             //Remove a pumping station -> find the adjacent edges to it -> Apply Edmonds Karp
             
             std::map<string , double> deficitBefore;
@@ -300,7 +306,7 @@ int main() {
                 }
 
             }
-        }if(task_choice == 6){
+        }else if(task_choice == 6){
             cout << endl;
             vector<pipe*> removed;
             map<string,double> oldFlows;
