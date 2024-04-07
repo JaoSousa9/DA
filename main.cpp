@@ -300,6 +300,89 @@ int main() {
                 }
 
             }
+        }if(task_choice == 6){
+            cout << endl;
+            vector<pipe*> removed;
+            map<string,double> oldFlows;
+
+            // Calculate flows before removing any pipes
+            for(auto &dsPair : cityMap) {
+                const string cityCode = dsPair.first;
+                double flow = edmondsKarp(&portugalGraph, SUPER_SOURCE, cityCode, &waterReservoirMap, &cityMap);
+                oldFlows.insert(pair<string, double>(cityCode, flow));
+            }
+
+            int code;
+            // Remove 1 or more pipes
+            while (true) {
+                cout << "Choose the pipe you desire to remove " << endl;
+                cout << "    -1: end" << endl;
+                map<int, pipe*> pipeMap;
+                int idx = 0;
+                int lines = 0;
+                for (auto &r: pipes) {
+                    if(lines == 5){
+                        lines = 0;
+                        cout << endl;
+                    }
+                    pipeMap.insert(pair<int, pipe*>(idx, &r));
+                    cout << "    " << idx << ": (" << r.getSource() << " " << r.getDest() << ") ";
+                    idx++, lines++;
+                }
+                cin >> code;
+                if(code == -1)
+                    break;
+
+                if (code >= 0 && code < idx) {
+                    pipe* p = pipeMap.at(code);
+                    portugalGraph.removeEdge(p->getSource(), p->getDest());
+                    cout << "Removed: (" << p->getSource() << "," << p->getDest() << ")" << endl;
+                    if (!p->isDirection()) {
+                        portugalGraph.removeEdge(p->getDest(), p->getSource());
+                        cout << "Removed: (" << p->getDest() << "," << p->getSource() << ")" << endl;
+                    }
+                    removed.push_back(p);
+                    pipes.erase(pipes.begin() + code);
+                }else{
+                    cout << "Select a valid number" << endl;
+                }
+            }
+            if(code == -1 && removed.empty()){
+                cout << "Nothing to do... No pipes were removed" << endl;
+                break;
+            }
+
+            // Calculate flows after removing pipes
+            cout << "City Code,Demand,Old Flow,New Flow" << endl;
+            for(auto &dsPair : cityMap) {
+                const string cityCode = dsPair.first;
+                city ct = dsPair.second;
+
+                string name = ct.getName();
+                double demand = ct.getDemand();
+                double oldFlow = oldFlows.at(cityCode);
+                double newFlow = edmondsKarp(&portugalGraph, SUPER_SOURCE, cityCode, &waterReservoirMap, &cityMap);
+
+                if (oldFlow == newFlow) continue;
+
+                cout << "("   << cityCode  << ", "
+                     << fixed << name      << ", "
+                     << fixed << demand    << ", "
+                     << fixed << oldFlow   << ", "
+                     << fixed << newFlow   << ") "
+                     << endl;
+            }
+            cout << endl << endl;
+
+
+            // Restore pipes
+            for(auto &i : removed){
+                pipes.push_back(*i);
+                if(!i->isDirection())
+                    portugalGraph.addBidirectionalEdge(i->getSource(), i->getDest(), i->getCapacity());
+                else
+                    portugalGraph.addEdge(i->getSource(), i->getDest(), i->getCapacity());
+            }
         }
     }
 
